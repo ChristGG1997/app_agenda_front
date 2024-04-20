@@ -1,12 +1,19 @@
-import React from 'react';
 import './App.css';
-import Home from './pages/Home'
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Home from './pages/Home';
+import Details from './pages/Details';
+import Add from './pages/Add';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="App">
-        <Home />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/detalle/:id" element={<Details />} />
+        <Route path="/agregar" element={<Add />} />
+      </Routes>
+    </Router>
   );
 }
 
