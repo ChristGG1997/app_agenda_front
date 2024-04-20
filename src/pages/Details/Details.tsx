@@ -6,10 +6,7 @@ import Dashboard from '../../components/Dashboard';
 import ImageModal from '../../components/ImageModal';
 
 import { getContact } from '../../services/contactService';
-
-
-
-
+import { updateContact } from '../../services/contactService';
 
 const Details: React.FC<DashboardProps> = () => {
     const [contact, setContact] = useState({
@@ -19,10 +16,10 @@ const Details: React.FC<DashboardProps> = () => {
         address: "",
         prefix: 0,
         email: "",
-        image: 'icons8-monkey-d-luffy.svg',
+        image: "",
     });
     const [isEditing, setIsEditing] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [originalContact, setOriginalContact] = useState(contact);
 
     const { id } = useParams<{ id: string }>();
 
@@ -31,7 +28,14 @@ const Details: React.FC<DashboardProps> = () => {
             if (id) {
                 await getContact(id).then((response) => {
                     if (response && typeof response === 'object' && response !== null) {
-                        setContact(response);                 
+                        setContact(prevState => ({
+                            ...prevState,
+                            ...response
+                        }));
+                        setOriginalContact(prevState => ({
+                            ...prevState,
+                            ...response
+                        }));
                     }
                 }).catch((error: unknown) => {
                     console.error('Error:', error);
@@ -42,75 +46,81 @@ const Details: React.FC<DashboardProps> = () => {
         fetchContact();
     }, [id]);
 
-
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setContact({ ...contact, [e.target.name]: e.target.value });
+        setContact(prevState => ({
+            ...prevState,
+            [e.target.name]: e.target.value
+        }));
     };
 
     const handleEdit = () => {
+        if (isEditing) {
+            setContact(originalContact);
+        } else {
+            setOriginalContact(contact);
+        }
         setIsEditing(!isEditing);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setIsEditing(false);
-    };
-
-    const handleImageClick = () => {
-        setIsModalOpen(true);
+        if (isEditing && id) {
+            await updateContact(id, contact).then(() => {
+                setIsEditing(false);
+            }).catch((error: unknown) => {
+                console.error('Error:', error);
+            });
+        }
     };
 
     const handleImageSelect = (image: string) => {
-        setContact({ ...contact, image: image });
-        setIsModalOpen(false);
+        setContact(prevState => ({ ...prevState, image: image }));
     };
 
     return (
         <Dashboard>
             <h1 className='text-3xl font-bold underline'>Detalles del Contacto</h1>
-            <div className='flex items-center space-x-4'>
+            <div className='flex-col items-center space-y-4'>
                 <img
-                    src={require(`../../assets/svg/${contact.image}`)}
+                    src={contact.image ? require(`../../assets/svg/${contact.image}`) : ""}
                     alt='Imagen del contacto'
-                    className='w-24 h-24 rounded-full object-cover'
-                    onClick={handleImageClick}
-                />
+                    className='w-48 h-48 rounded-full object-cover mx-auto'
+                    />
                 <ImageModal
-                    isOpen={isModalOpen}
+                    isOpen={isEditing}
                     onSelect={handleImageSelect}
                 />
-                <form onSubmit={handleSubmit} className='space-y-4'>
+<form onSubmit={handleSubmit} className='flex flex-col items-center space-y-4'>
                     <input
-                        name='nombre'
+                        name='name'
                         value={contact.name}
                         onChange={handleChange}
                         placeholder='Nombre'
-                        className='w-full p-2 border rounded'
+                        className='w-1/2 p-2 border rounded mx-auto'
                         disabled={!isEditing}
                     />
                     <input
-                        name='telefono'
+                        name='phone'
                         value={contact.phone}
                         onChange={handleChange}
                         placeholder='Teléfono'
-                        className='w-full p-2 border rounded'
+                        className='w-1/2 p-2 border rounded mx-auto'
                         disabled={!isEditing}
                     />
                     <input
-                        name='direccion'
+                        name='address'
                         value={contact.address}
                         onChange={handleChange}
                         placeholder='Dirección'
-                        className='w-full p-2 border rounded'
+                        className='w-1/2 p-2 border rounded mx-auto'
                         disabled={!isEditing}
                     />
                     <input
-                        name='prefijo'
+                        name='prefix'
                         value={contact.prefix}
                         onChange={handleChange}
                         placeholder='Prefijo'
-                        className='w-full p-2 border rounded'
+                        className='w-1/2 p-2 border rounded mx-auto'
                         disabled={!isEditing}
                     />
                     <input
@@ -118,7 +128,7 @@ const Details: React.FC<DashboardProps> = () => {
                         value={contact.email}
                         onChange={handleChange}
                         placeholder='Email'
-                        className='w-full p-2 border rounded'
+                        className='w-1/2 p-2 border rounded mx-auto'
                         disabled={!isEditing}
                     />
                     <div className='flex space-x-2'>
