@@ -13,9 +13,11 @@ const Details: React.FC<DashboardProps> = () => {
     const [contact, setContact] = useState<Contact>();
     const [isEditing, setIsEditing] = useState(false);
     const [originalContact, setOriginalContact] = useState(contact);
-
+    
+    // Obtenemos el id del contacto de los parámetros de la ruta
     const { id } = useParams<{ id: string }>();
 
+    // Usamos el hook useEffect para obtener el contacto cuando el componente se monta o el id cambia
     useEffect(() => {
         const fetchContact = async () => {
             if (id) {
@@ -39,6 +41,7 @@ const Details: React.FC<DashboardProps> = () => {
         fetchContact();
     }, [id]);
 
+    // Definimos la función para manejar el cambio en los inputs
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setContact(prevState => {
             if (prevState) {
@@ -58,6 +61,7 @@ const Details: React.FC<DashboardProps> = () => {
         });
     };
 
+    // Definimos la función para manejar la edición
     const handleEdit = () => {
         if (isEditing) {
             setContact(originalContact);
@@ -67,6 +71,7 @@ const Details: React.FC<DashboardProps> = () => {
         setIsEditing(!isEditing);
     };
 
+    // Definimos la función para manejar el envío del formulario
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isEditing && id) {
@@ -78,6 +83,7 @@ const Details: React.FC<DashboardProps> = () => {
         }
     };
 
+    // Definimos la función para manejar la selección de la imagen
     const handleImageSelect = (image: string) => {
         setContact(prevState => {
             if (prevState) {

@@ -8,13 +8,13 @@ import { Contact } from '../../utils/ContactInterfaz'
 import { getContacts } from '../../services/contactService';
 import { deleteContact } from '../../services/contactService';
 
-
+// Importamos las funciones del servicio de contactos
 const Home: React.FC<DashboardProps> = () => {
 
   const [view, setView] = useState('list');
-
   const [contacts, setContacts] = useState<Contact[]>([]);
 
+  // Usamos el hook useEffect para obtener los contactos cuando el componente se monta
   useEffect(() => {
     const fetchContacts = async () => {
       await getContacts().then((response) => {
@@ -27,6 +27,7 @@ const Home: React.FC<DashboardProps> = () => {
     fetchContacts();
   }, []);
 
+  // Definimos la función para manejar la eliminación de un contacto
   const handleDelete = (id: number) => {
     deleteContact(id.toString())
       .then(() => {
