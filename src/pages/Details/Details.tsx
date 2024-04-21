@@ -4,20 +4,13 @@ import './Details.css';
 import { DashboardProps } from '../../components/Dashboard/DashboardProps';
 import Dashboard from '../../components/Dashboard';
 import ImageModal from '../../components/ImageModal';
+import { Contact } from '../../utils/ContactInterfaz'
 
 import { getContact } from '../../services/contactService';
 import { updateContact } from '../../services/contactService';
 
 const Details: React.FC<DashboardProps> = () => {
-    const [contact, setContact] = useState({
-        id: 0,
-        name: "",
-        phone: 0,
-        address: "",
-        prefix: 0,
-        email: "",
-        image: "",
-    });
+    const [contact, setContact] = useState<Contact>();
     const [isEditing, setIsEditing] = useState(false);
     const [originalContact, setOriginalContact] = useState(contact);
 
@@ -47,10 +40,22 @@ const Details: React.FC<DashboardProps> = () => {
     }, [id]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setContact(prevState => ({
-            ...prevState,
-            [e.target.name]: e.target.value
-        }));
+        setContact(prevState => {
+            if (prevState) {
+                return { ...prevState, [e.target.name]: e.target.value };
+            } else {
+                return {
+                    id: 0,
+                    name: "",
+                    phone: 0,
+                    address: "",
+                    prefix: 0,
+                    email: "",
+                    image: "",
+                    [e.target.name]: e.target.value,
+                };
+            }
+        });
     };
 
     const handleEdit = () => {
@@ -74,7 +79,21 @@ const Details: React.FC<DashboardProps> = () => {
     };
 
     const handleImageSelect = (image: string) => {
-        setContact(prevState => ({ ...prevState, image: image }));
+        setContact(prevState => {
+            if (prevState) {
+                return { ...prevState, image: image };
+            } else {
+                return {
+                    id: 0,
+                    name: "",
+                    phone: 0,
+                    address: "",
+                    prefix: 0,
+                    email: "",
+                    image: image,
+                };
+            }
+        });
     };
 
     return (
@@ -82,18 +101,18 @@ const Details: React.FC<DashboardProps> = () => {
             <h1 className='text-3xl font-bold underline'>Detalles del Contacto</h1>
             <div className='flex-col items-center space-y-4'>
                 <img
-                    src={contact.image ? require(`../../assets/svg/${contact.image}`) : ""}
+                    src={contact?.image ? require(`../../assets/svg/${contact.image}`) : ""}
                     alt='Imagen del contacto'
                     className='w-48 h-48 rounded-full object-cover mx-auto'
-                    />
+                />
                 <ImageModal
                     isOpen={isEditing}
                     onSelect={handleImageSelect}
                 />
-<form onSubmit={handleSubmit} className='flex flex-col items-center space-y-4'>
+                <form onSubmit={handleSubmit} className='flex flex-col items-center space-y-4'>
                     <input
                         name='name'
-                        value={contact.name}
+                        value={contact?.name}
                         onChange={handleChange}
                         placeholder='Nombre'
                         className='w-1/2 p-2 border rounded mx-auto'
@@ -101,7 +120,7 @@ const Details: React.FC<DashboardProps> = () => {
                     />
                     <input
                         name='phone'
-                        value={contact.phone}
+                        value={contact?.phone}
                         onChange={handleChange}
                         placeholder='Teléfono'
                         className='w-1/2 p-2 border rounded mx-auto'
@@ -109,7 +128,7 @@ const Details: React.FC<DashboardProps> = () => {
                     />
                     <input
                         name='address'
-                        value={contact.address}
+                        value={contact?.address}
                         onChange={handleChange}
                         placeholder='Dirección'
                         className='w-1/2 p-2 border rounded mx-auto'
@@ -117,7 +136,7 @@ const Details: React.FC<DashboardProps> = () => {
                     />
                     <input
                         name='prefix'
-                        value={contact.prefix}
+                        value={contact?.prefix}
                         onChange={handleChange}
                         placeholder='Prefijo'
                         className='w-1/2 p-2 border rounded mx-auto'
@@ -125,7 +144,7 @@ const Details: React.FC<DashboardProps> = () => {
                     />
                     <input
                         name='email'
-                        value={contact.email}
+                        value={contact?.email}
                         onChange={handleChange}
                         placeholder='Email'
                         className='w-1/2 p-2 border rounded mx-auto'
